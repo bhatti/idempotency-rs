@@ -1,0 +1,26 @@
+stateDiagram-v2
+    [*] --> Pending : Initial request
+    Pending --> Completed : Success
+    Pending --> Failed_Retryable : 5xx error
+    Pending --> Failed_Permanent : 4xx error
+    Pending --> Expired : Lock timeout
+    
+    Failed_Retryable --> Pending : Retry allowed
+    Failed_Permanent --> [*] : No retry allowed
+    Expired --> Pending : Lock reacquired
+    Completed --> [*] : Cached response returned
+    
+    state Pending {
+        [*] --> Locked
+        Locked --> Processing
+        Processing --> [*]
+    }
+    
+    note right of Failed_Retryable
+        Server errors (5xx)\nInfrastructure failures
+    end note
+    
+    note right of Failed_Permanent
+        Client errors (4xx)\nBusiness rule violations
+    end note
+

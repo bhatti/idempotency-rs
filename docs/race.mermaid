@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant A as Request A
+    participant B as Request B  
+    participant DB as Database
+    participant PS as Payment System
+    
+    Note over A,PS: The Dangerous Check-Then-Act Pattern
+    
+    A->>DB: Check if key exists
+    B->>DB: Check if key exists
+    DB->>A: Key not found ✓
+    DB->>B: Key not found ✓
+    
+    rect rgb(139, 0, 0)
+        Note right of B: Both requests proceed!
+        A->>PS: Process $1000 payment
+        B->>PS: Process $1000 payment
+        PS->>A: Payment successful
+        PS->>B: Payment successful  
+    end
+    
+    A->>DB: Save idempotency key
+    B->>DB: Save idempotency key
+    
+    Note over A,PS: Result: Customer charged $2000 instead of $1000

@@ -1,0 +1,63 @@
+[package]
+name = "idempotency-rs"
+version = "1.0.0"
+edition = "2021"
+authors = ["Shahzad Bhatti<bhatti@plexobject.com>"]
+description = "Sample code of idempotency middleware for Rust web services"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yourusername/idempotency-rs"
+keywords = ["idempotency", "middleware", "distributed-systems", "api", "reliability"]
+categories = ["web-programming", "asynchronous", "database"]
+
+[dependencies]
+# Core dependencies
+async-trait = "0.1"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.6", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10"
+tracing = "0.1"
+tokio = { version = "1.35", features = ["full"] }
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "chrono", "uuid"] }
+redis = { version = "0.24", features = ["tokio-comp", "connection-manager"], optional = true }
+
+# Web framework integrations (optional)
+axum = { version = "0.7", optional = true }
+actix-web = { version = "4.4", optional = true }
+tonic = { version = "0.10", optional = true }
+tower = { version = "0.4", optional = true }
+hyper = { version = "1.0", optional = true }
+
+[dev-dependencies]
+tokio-test = "0.4"
+pretty_assertions = "1.4"
+tempfile = "3.8"
+wiremock = "0.6"
+criterion = "0.5"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[features]
+default = ["sqlite", "redis"]
+sqlite = ["sqlx/sqlite"]
+#redis = ["dep:redis"]
+axum-integration = ["dep:axum", "dep:tower", "dep:hyper"]
+actix-integration = ["dep:actix-web"]
+grpc = ["dep:tonic"]
+full = ["sqlite", "axum-integration", "actix-integration", "grpc"] # redis
+
+[[bench]]
+name = "idempotency_benchmarks"
+harness = false
+
+[profile.release]
+#opt-level = 3
+#lto = true
+codegen-units = 1
+
+[profile.dev]
+#opt-level = 0
+debug = false

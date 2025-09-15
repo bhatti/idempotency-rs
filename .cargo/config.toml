@@ -1,0 +1,13 @@
+[build]
+target-dir = "target"
+
+# Remove or comment out the lld configuration for macOS
+# [target.x86_64-unknown-linux-gnu]
+# rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+# [target.x86_64-apple-darwin]
+# rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[env]
+RUST_LOG = "debug,sqlx=warn"
+DATABASE_URL = "sqlite:./test.db"

@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph "Workflow: Create Order"
+        A[Create Order<br/>key: workflow-123:step-1] --> B[Charge Payment<br/>key: workflow-123:step-2]
+        B --> C[Allocate Inventory<br/>key: workflow-123:step-3]
+        C --> D[Send Confirmation<br/>key: workflow-123:step-4]
+    end
+    
+    subgraph "Failure Recovery"
+        E[Step 2 fails] --> F[Resume from step 2]
+        F --> G[Skip completed step 1]
+        G --> H[Retry step 2 with same key]
+    end
+    
+    style A fill:#006400
+    style B fill:#8b0000
+    style C fill:#2f4f4f
+    style D fill:#2f4f4f
+    style F fill:#4b0082
+    style G fill:#800080
+    style H fill:#191970

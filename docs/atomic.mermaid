@@ -1,0 +1,30 @@
+flowchart TD
+    A[Request arrives] --> B{Idempotency key provided?}
+    B -->|No| C[Return 400 Bad Request]
+    B -->|Yes| D[Generate request fingerprint]
+    
+    D --> E[Atomically try to acquire lock]
+    
+    E --> F{Lock result?}
+    
+    F -->|Acquired| G[Execute business logic]
+    F -->|Already completed| H[Return cached response]
+    F -->|In progress| I[Return 409 Conflict with Retry-After]
+    F -->|Key reused| J[Return 422 Key Reused Error]
+    F -->|Failed permanently| K[Return cached failure response]
+    
+    G --> L{Business logic result?}
+    L -->|Success| M[Cache response & complete]
+    L -->|Error| N[Release lock for retry]
+    
+    M --> O[Return response]
+    N --> P[Return error]
+    
+    style A fill:#191970
+    style G fill:#4b0082
+    style M fill:#006400
+    style H fill:#006400
+    style I fill:#800080
+    style J fill:#8b0000
+    style K fill:#8b0000
+    style N fill:#8b4513
