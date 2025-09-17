@@ -1,0 +1,15 @@
+graph TD
+    A[Client Request] --> B[Start Transaction]
+    B --> C[Update Database]
+    C --> D{Database Success?}
+    D -->|Yes| E[Publish Event]
+    D -->|No| F[Rollback Transaction]
+    E --> G{Event Publish Success?}
+    G -->|Yes| H[Commit Transaction]
+    G -->|No| I[Database Updated but Event Lost!]
+    F --> J[Transaction Failed - Consistent State]
+    I --> K[Inconsistent State - Data Corruption!]
+    H --> L[Success - Both Updated]
+    
+    style I fill:#191970,stroke:#ff0000
+    style K fill:#4b0082,stroke:#ff0000

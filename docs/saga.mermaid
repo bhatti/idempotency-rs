@@ -1,0 +1,17 @@
+stateDiagram-v2
+    [*] --> CreateOrder
+    CreateOrder --> ProcessPayment : Order Created
+    ProcessPayment --> ReserveInventory : Payment Processed
+    ReserveInventory --> SendConfirmation : Inventory Reserved
+    SendConfirmation --> [*] : Success!
+    
+    %% Compensation flows (rollback)
+    ProcessPayment --> CancelOrder : Payment Failed
+    ReserveInventory --> RefundPayment : Inventory Failed  
+    SendConfirmation --> ReleaseInventory : Confirmation Failed
+    
+    %% Compensation chain
+    RefundPayment --> CancelOrder : Refund Complete
+    ReleaseInventory --> RefundPayment : Inventory Released
+    
+    CancelOrder --> [*] : Fully Compensated

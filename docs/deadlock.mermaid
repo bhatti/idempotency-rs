@@ -1,0 +1,24 @@
+graph TD
+    subgraph "❌ DEADLOCK SCENARIO"
+        T1A[Transaction 1] --> L1A[Lock Account A]
+        T2A[Transaction 2] --> L2B[Lock Account B]
+        L1A --> W1B[Wait for Account B]
+        L2B --> W2A[Wait for Account A]
+        W1B --> DL[💀 DEADLOCK!]
+        W2A --> DL
+    end
+    
+    subgraph "✅ DEADLOCK PREVENTION"
+        T1B[Transaction 1] --> SORT1[Sort: A < B]
+        T2B[Transaction 2] --> SORT2[Sort: A < B]
+        SORT1 --> L1AB[Lock Account A first]
+        SORT2 --> W2AB[Wait for Account A]
+        L1AB --> L1BB[Lock Account B second]
+        L1BB --> C1[Complete Transfer]
+        C1 --> R1[Release Both Locks]
+        R1 --> L2AB[Transaction 2 gets Account A]
+        L2AB --> L2BB[Then gets Account B]
+        L2BB --> C2[Complete Transfer]
+    end
+    
+    style DL fill:#191970,stroke:#ff0000

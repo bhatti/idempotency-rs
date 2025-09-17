@@ -1,0 +1,60 @@
+graph TD
+    subgraph "CLIENT LAYER"
+        WEB[Web Application]
+        API[API Clients]
+        MOBILE[Mobile Apps]
+    end
+    
+    subgraph "COMMAND SIDE (Writes)"
+        CMD_API[Command API]
+        CMD_SVC[Command Service]
+        WRITE_DB[(Write Database<br/>ACID Transactions<br/>Serializable Isolation)]
+        EVT_PUB[Event Publisher]
+    end
+    
+    subgraph "QUERY SIDE (Reads)"  
+        QRY_API[Query API]
+        QRY_SVC[Query Service]
+        READ_DB[(Read Database<br/>Optimized for Queries<br/>Read-Only Transactions)]
+        CACHE[Redis Cache]
+        SEARCH[Elasticsearch]
+    end
+    
+    subgraph "EVENT PROCESSING"
+        EVT_BUS[Event Bus]
+        EVT_HANDLER[Event Handlers]
+        OUTBOX[(Outbox Table)]
+    end
+    
+    %% Command flow
+    WEB --> CMD_API
+    API --> CMD_API
+    CMD_API --> CMD_SVC
+    CMD_SVC --> WRITE_DB
+    CMD_SVC --> OUTBOX
+    OUTBOX --> EVT_PUB
+    EVT_PUB --> EVT_BUS
+    
+    %% Query flow
+    WEB --> QRY_API
+    MOBILE --> QRY_API
+    QRY_API --> QRY_SVC
+    QRY_SVC --> READ_DB
+    QRY_SVC --> CACHE
+    QRY_SVC --> SEARCH
+    
+    %% Event processing
+    EVT_BUS --> EVT_HANDLER
+    EVT_HANDLER --> READ_DB
+    EVT_HANDLER --> CACHE
+    EVT_HANDLER --> SEARCH
+    
+    classDef commandStyle fill:#ffeb3b,stroke:#ff8f00,color:#000
+    classDef queryStyle fill:#4caf50,stroke:#2e7d32,color:#fff
+    classDef eventStyle fill:#2196f3,stroke:#1565c0,color:#fff
+    classDef dbStyle fill:#9c27b0,stroke:#6a1b9a,color:#fff
+    
+    class CMD_API,CMD_SVC commandStyle
+    class QRY_API,QRY_SVC queryStyle
+    class EVT_PUB,EVT_BUS,EVT_HANDLER eventStyle
+    class WRITE_DB,READ_DB,OUTBOX dbStyle

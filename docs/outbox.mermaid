@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant Client
+    participant App as Application
+    participant DB as Database
+    participant Outbox as Outbox Table
+    participant Relay as Event Relay
+    participant Queue as Message Queue
+    participant Consumer as Event Consumer
+
+    Client->>App: Create Order Request
+    App->>DB: Begin Transaction
+    App->>DB: Insert Order
+    App->>Outbox: Insert Event (PENDING)
+    DB->>App: Commit Transaction
+    App->>Client: Order Created Response
+    
+    Note over Relay: Polling every 1 second
+    Relay->>Outbox: Query PENDING events
+    Outbox->>Relay: Return events
+    Relay->>Queue: Publish Event
+    Queue->>Relay: Success
+    Relay->>Outbox: Update status to PROCESSED
+    
+    Queue->>Consumer: Deliver Event
+    Consumer->>Consumer: Process Event
+    Consumer->>Queue: Acknowledge
+    
+    Note over DB,Outbox: Both updates in same transaction = Atomic!

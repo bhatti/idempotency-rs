@@ -1,0 +1,50 @@
+graph TD
+    subgraph "Application Server"
+        T1[Thread 1] 
+        T2[Thread 2]
+        T3[Thread 3]
+        T4[Thread 4]
+        T5[Thread 5]
+        T6["Thread 6...100"]
+        style T6 fill:#4b0082
+    end
+    
+    subgraph "Connection Pool"
+        C1[Connection 1]
+        C2[Connection 2] 
+        C3[Connection 3]
+        C4[Connection 4]
+        C5[Connection 5]
+        C6["Connections 6-10"]
+        style C6 fill:#800080
+    end
+    
+    subgraph "Database"
+        DB[(PostgreSQL)]
+    end
+    
+    T1 --> C1
+    T2 --> C2
+    T3 --> C3
+    T4 --> C4
+    T5 --> C5
+    T6 -.-> X[❌ No Available Connections!]
+    
+    C1 --> DB
+    C2 --> DB
+    C3 --> DB
+    C4 --> DB
+    C5 --> DB
+    C6 --> DB
+    
+    X --> DEADLOCK[💀 Thread Pool Deadlock]
+    
+    style X fill:#191970,stroke:#ff0000
+    style DEADLOCK fill:#191970,stroke:#ff0000
+    
+    classDef threadStyle fill:#8b4513,stroke:#1976d2
+    classDef connStyle fill:#8b0000,stroke:#388e3c
+    
+    class T1,T2,T3,T4,T5 threadStyle
+    class C1,C2,C3,C4,C5 connStyle
+
