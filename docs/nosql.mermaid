@@ -1,0 +1,27 @@
+graph TD
+    subgraph "Consistency Spectrum"
+        SC[Strict Consistency<br/>Global Lock - Impractical]
+        LC[Linearizability<br/>Total Order - Expensive]
+        SEQ[Sequential Consistency<br/>Per-Process Order]
+        CAUSAL[Causal Consistency<br/>Cause → Effect Order]
+        EVENTUAL[Eventual Consistency<br/>Converges Eventually]
+        WEAK[Weak Consistency<br/>No Guarantees]
+    end
+    
+    subgraph "Database Examples"
+        SPANNER[Google Spanner<br/>Linearizable]
+        DYNAMO[DynamoDB<br/>Eventual + Strong]
+        CASSANDRA[Cassandra<br/>Tunable]
+        MONGO[MongoDB<br/>Causal → Linear]
+        REDIS[Redis<br/>Weak → Strong]
+    end
+    
+    LC --> SPANNER
+    EVENTUAL --> DYNAMO
+    SEQ --> CASSANDRA
+    CAUSAL --> MONGO
+    EVENTUAL --> REDIS
+    
+    style LC fill:#ff5722,stroke:#d32f2f,color:#fff
+    style EVENTUAL fill:#4caf50,stroke:#388e3c,color:#fff
+    style CAUSAL fill:#ff9800,stroke:#f57c00,color:#fff
